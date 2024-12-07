@@ -204,79 +204,78 @@ void overlay_FLASH_ConfigureTrimValues(void) {
     overlay_FLASH_SetArea(FLASH_AREA_MAIN);
 }
 
-
+//запись в ОЗУ+ (uint32_t адрес, uint32_t слова, uint32_t количество слов)
 void ProgramMoreWords(uint32_t DestAddr, const uint32_t *words, uint32_t num) {
     const uint32_t *pWord = (const uint32_t *) words;
 
-    while (overlay_FLASH_IsBusy()) {}//��ѯFLASH������æ��־���ȴ�����������READY״̬��
-    overlay_FLASH_SetMode(FLASH_MODE_PROGRAM); //����ģʽΪ��̲�����
+    while (overlay_FLASH_IsBusy()) {}//Запросите флаг занятости контроллера FLASH и подождите, пока контроллер перейдет в состояние READY;
+    overlay_FLASH_SetMode(FLASH_MODE_PROGRAM); //Режим конфигурации — это операция программирования;
 
-    for (uint32_t i = 0;i < num; i++) { //�����д�������ݣ����ж� PROG_BUF_EMPTY λ�Ƿ�Ϊ 0��Ϊ 0 ʱ�����д����һ������̵��֣�Ϊ 1 ʱ�ȴ�������д�룩��ֱ�����д��������ȫ��д����ɣ�
-        FLASH_ADDR = (DestAddr + i * 4) >> 2; //д���̵�ַ������Ϊ��λ��
-        FLASH_WDATA = *pWord++; //����������ݷŵ����ݼĴ����У�
-        overlay_FLASH_Start();//����FLASH����������START���
+    for (uint32_t i = 0;i < num; i++) { //Если еще есть данные для программирования, определите, равен ли бит PROG_BUF_EMPTY 0. Если он равен 0, вы можете записать следующее слово, которое нужно запрограммировать (если оно 1, подождите и не сможете записать), пока все данные, которые нужно запрограммировать, не будут записаны. написано;
+        FLASH_ADDR = (DestAddr + i * 4) >> 2; //Напишите адрес программирования прописью;
+        FLASH_WDATA = *pWord++; //Поместите данные для программирования в регистр данных;
+        overlay_FLASH_Start();//Настройте разблокировку FLASH и подайте команду СТАРТ;
         while (overlay_FLASH_IsNotEmpty());
 
     }
-    while (overlay_FLASH_IsBusy()) {}//��ѯFLASH������æ��־���ȴ�����������READY״̬��
-    overlay_FLASH_SetMode(FLASH_CFG_MODE_VALUE_READ_AHB); //����ģʽΪ��̲�����
+    while (overlay_FLASH_IsBusy()) {}//Запросите флаг занятости контроллера FLASH и подождите, пока контроллер перейдет в состояние READY;
+    overlay_FLASH_SetMode(FLASH_CFG_MODE_VALUE_READ_AHB); //Режим конфигурации — это операция программирования;
     overlay_FLASH_Lock();
 }
 
+//запись в ОЗУ (uint32_t адрес, uint32_t слова)
 void ProgramWords(uint32_t DestAddr, uint32_t words) {
     __disable_irq();
 
-    while (overlay_FLASH_IsBusy()) {}//��ѯFLASH������æ��־���ȴ�����������READY״̬��
+    while (overlay_FLASH_IsBusy()) {}//Запросите флаг занятости контроллера FLASH и подождите, пока контроллер перейдет в состояние READY;
 
-    overlay_FLASH_SetMode(FLASH_MODE_PROGRAM); //����ģʽΪ��̲�����
+    overlay_FLASH_SetMode(FLASH_MODE_PROGRAM); //Режим конфигурации — это операция программирования;
 
-    FLASH_ADDR = DestAddr >> 2; //д���̵�ַ������Ϊ��λ��
-    FLASH_WDATA = words; //����������ݷŵ����ݼĴ����У�
-    overlay_FLASH_Start();//����FLASH����������START���
-    while (overlay_FLASH_IsBusy()) {}//��ѯFLASH������æ��־���ȴ�����������READY״̬��
-    overlay_FLASH_SetMode(FLASH_CFG_MODE_VALUE_READ_AHB); //����ģʽΪ��̲�����
+    FLASH_ADDR = DestAddr >> 2; //Напишите адрес программирования прописью;
+    FLASH_WDATA = words; //Поместите данные для программирования в регистр данных;
+    overlay_FLASH_Start();//Настройте разблокировку FLASH и подайте команду СТАРТ;
+    while (overlay_FLASH_IsBusy()) {}//Запросите флаг занятости контроллера FLASH и подождите, пока контроллер перейдет в состояние READY;
+    overlay_FLASH_SetMode(FLASH_CFG_MODE_VALUE_READ_AHB); //Режим конфигурации — это операция программирования;
     overlay_FLASH_Lock();
 }
 
+//копирование из EEPROM в EEPROM
+void CP_EEPROM_TO_EEPROM(uint32_t eeprom_from, uint32_t eeprom_to, uint32_t size) {
+    char str[20];
+    uint16_t once_size=128;
+    uint8_t c[128];
 
-//CP_EEPROM_TO_FLASH(0x5000,0xa000,10*1024);
+    for (int i = 0; i < size / once_size; ++i) { //size конфига 8192 байта, количество итераций 64 раза
+        EEPROM_ReadBuffer(eeprom_from + i * once_size, (uint8_t *) & c, once_size); //читаем в переменную c в RAM 128 Байт
+        EEPROM_WriteBuffer(eeprom_to + i * once_size, (uint8_t * ) & c, once_size); //пишем из RAM 128 Байт (при бэкапе последней проши, на последней итерации, size=8192, адрес=3E000+1F80 )
+        if (i % (2048/once_size) == 0) {
+            sprintf(str, "Config: %02d%%", i * 100 / (size / once_size));
+            UI_PrintStringSmall(str, 20, 0, 3);
+            ST7565_BlitFullScreen();
+        }
+    }
+    EEPROM_ReadBuffer(eeprom_from + (size / once_size) * once_size, (uint8_t *) & c, size-(size / once_size) * once_size);
+    EEPROM_WriteBuffer((size / once_size) * once_size+ eeprom_to, (uint8_t * ) & c, (size-(size / once_size) * once_size));
+}
+
+//копирование из EEPROM во Flash
 void CP_EEPROM_TO_FLASH(uint32_t eeprom_add, uint32_t flash_add, uint32_t size) {
     char str[20];
     uint16_t once_size=128;
     uint32_t c[once_size/4];
 
-    for (int i = 0; i < size / once_size; ++i) {
-        EEPROM_ReadBuffer(eeprom_add + i * once_size, (uint8_t *) &c, once_size);
-
-//        ProgramWords(i * 128 + flash_add, c);
-
-        ProgramMoreWords(i * once_size + flash_add, c, once_size/4);
-//        uint32_t d = overlay_FLASH_ReadByAHB(i * 4 + flash_add);
-//        if (d != c) {
-//            memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
-//            UI_PrintStringSmall("Flash Failed!", 0, 127, 2);
-////            UI_PrintStringSmall("Please Reboot!", 0, 127, 4);
-//            ST7565_BlitFullScreen();
-//            while(1);
-//        }
-//        if (i % 512 == 0) {
-//            sprintf(str, "Load: %02d%%", i * 100 / (size / 4));
-//            UI_PrintStringSmall(str, 20, 0, 2);
-//            ST7565_BlitFullScreen();
-//        }
-
+    for (int i = 0; i < size / once_size; ++i) { //количество итераций не более 480 раз
+        EEPROM_ReadBuffer(eeprom_add + i * once_size, (uint8_t *) &c, once_size); //читаем в переменную c в RAM 128 байт
+        ProgramMoreWords(i * once_size + flash_add, c, once_size/4); //пишем 32 слова по 32 бита (4 Байта) = в сумме те же самые 128 байт
         if (i % (2048/once_size) == 0) {
             sprintf(str, "Load: %02d%%", i * 100 / (size / once_size));
             UI_PrintStringSmall(str, 20, 0, 2);
             ST7565_BlitFullScreen();
         }
-
     }
 
     EEPROM_ReadBuffer(eeprom_add + (size / once_size) * once_size, (uint8_t *) &c, size-(size / once_size) * once_size);
     ProgramMoreWords((size / once_size) * once_size+ flash_add, c, (size-(size / once_size) * once_size)/4);
-
-
 }
 
 //JUMP_TO_FLASH(0xa10A,0x20003ff0);
@@ -290,24 +289,24 @@ void JUMP_TO_FLASH(uint32_t flash_add, uint32_t stack_add) {
 void Erase_Flash(uint32_t sector) {
     __disable_irq();
 
-    while (overlay_FLASH_IsBusy()) {}//��ѯFLASH������æ��־���ȴ�����������READY״̬��
-    overlay_FLASH_SetMode(FLASH_CFG_MODE_VALUE_ERASE); //����ģʽΪ������������
+    while (overlay_FLASH_IsBusy()) {}//Запросите флаг занятости контроллера FLASH и подождите, пока контроллер перейдет в состояние READY;
+    overlay_FLASH_SetMode(FLASH_CFG_MODE_VALUE_ERASE); //Режим конфигурации — операция стирания сектора;
 
-    FLASH_ADDR = sector << 7;//    3�� д����������ʼ��ַ������Ϊ��λ��
+    FLASH_ADDR = sector << 7;//    3 Напишите прописью начальный адрес стирания сектора;
 
-    overlay_FLASH_Start();//    4�� ���� FLASH ���������� START ���
-    while (overlay_FLASH_IsBusy()) {}//��ѯFLASH������æ��־���ȴ�����������READY״̬��
-    overlay_FLASH_SetMode(FLASH_CFG_MODE_VALUE_READ_AHB); //����ģʽΪ��̲�����
+    overlay_FLASH_Start();//    4 Настройте FLASH для разблокировки и запуска команды СТАРТ;
+    while (overlay_FLASH_IsBusy()) {}//Запросите флаг занятости контроллера FLASH и подождите, пока контроллер перейдет в состояние READY;
+    overlay_FLASH_SetMode(FLASH_CFG_MODE_VALUE_READ_AHB); //Режим конфигурации — это операция программирования;
     overlay_FLASH_Lock();
-//    5�� ��ѯ FLASH ������æ��־���ȴ����������� READY ״̬��
-//    6�� ����ģʽΪ��������FLASH �������������������
+//    5 Запросите флаг занятости контроллера FLASH и подождите, пока контроллер перейдет в состояние READY;
+//    6 Режим конфигурации — операция чтения, FLASH заблокирована, операция стирания сектора завершена.
 }
 
 void write_to_memory(uint32_t address, uint32_t data) {
-    // ����ַ��ֵת��Ϊָ��
+    // Преобразовать значение адреса в указатель
     uint32_t *target_address = (uint32_t *) address;
-    // ��Ŀ���ַд������
+    // Запись данных на целевой адрес
     *target_address = data;
-    // Ϊ�˱����Ż���ȷ�����벻�ᱻ�Ż���
+    // Чтобы избежать оптимизации, убедитесь, что код не оптимизирован
     volatile uint32_t read_back = *target_address;
 }

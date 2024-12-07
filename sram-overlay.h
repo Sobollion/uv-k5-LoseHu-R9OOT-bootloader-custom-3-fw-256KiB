@@ -48,6 +48,7 @@ uint32_t overlay_FLASH_ReadNvrWord(uint32_t Offset) __attribute__((section(".sra
 void overlay_FLASH_ConfigureTrimValues(void) __attribute__((section(".sramtext")));
 void ProgramWords(uint32_t DestAddr,uint32_t words)__attribute__((section(".sramtext")));
 void JUMP_TO_FLASH(uint32_t flash_add,uint32_t stack_add)__attribute__((section(".sramtext")));
+void CP_EEPROM_TO_EEPROM(uint32_t eeprom_from,uint32_t eeprom_to,uint32_t size)__attribute__((section(".sramtext")));
 void CP_EEPROM_TO_FLASH(uint32_t eeprom_add,uint32_t flash_add,uint32_t size)__attribute__((section(".sramtext")));
 void Erase_Flash(uint32_t sector)__attribute__((section(".sramtext")));
 void write_to_memory(uint32_t address, uint32_t data) ;

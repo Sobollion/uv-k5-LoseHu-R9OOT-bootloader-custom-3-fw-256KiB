@@ -11,7 +11,7 @@ ENABLE_CHINESE_FULL 		   = 0
 ENABLE_ENGLISH				    =0
 
 #############################################################
-PACKED_FILE_SUFFIX = L_BL002
+PACKED_FILE_SUFFIX = BL_3_001
 
 
 
