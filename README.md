@@ -1,45 +1,32 @@
-**Read this in other languages: [English](README_en.md), [中文](README.md).**
 
-**语言版本: [English](README_en.md), [中文](README.md).**
+[![support me](https://img.shields.io/badge/Support%20me-CloudTips-blue)](https://pay.cloudtips.ru/p/c197b86d) [![readme ru](https://img.shields.io/badge/README%20%D0%BD%D0%B0%20%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%BE%D0%BC-214a57)](/README_RU.md)
 
-# 一种用于泉盛UVK5固件切换的引导程序
+# Bootloader for Quansheng UVK5 Firmware Switching
+* 3 firmware Multiboot with independent settings, channels and calibrations for 256 KiB EEPROM
 
-# 功能说明
-* 能从eeprom中读取固件，写入flash中，实现任意版本固件切换
-* 读取eeprom中存在的有效固件，并通过按键选择加载
+# Function Description
+* Capable of reading firmware from EEPROM and writing it to flash, allowing switching between different firmware versions.
+* Reads valid firmware from EEPROM and allows selection via button press for loading.
 
+# Principle Description
+* Rewrite the UV-K5 bootloader to load Bootloader B into RAM from EEPROM on startup, then jump to Bootloader B in RAM.
+* Bootloader B:
+    * Reads firmware from EEPROM and writes it to FLASH.
+    * Supports traditional burning communication protocols.
 
-# 原理说明
-* 重写UV-K5引导程序，使之开机可从EEPROM加载引导B进入RAM，然后跳转到RAM中的引导B
-* 引导B:
-  * 从EEPROM中读取固件，写入FLASH中
-  * 具有原版传统烧录通讯协议
-  
+# Requirements
+* This bootloader suitable for UVK5 with 2M (256KiB) EEPROM.
+* Due to flash size limitations, individual firmware size should not exceed 60KB.
+* Requires ST-Link to flash the new bootloader into UVK5's FLASH.
 
-# 使用条件
-* 受到语言影响，需要大约150KB用于中文输入法，所以此引导程序只适用于4Mib(512KB)EEPROM的UVK5。
-* 由于FLASH大小限制，单个固件的大小仍然不能超过60KB。
-* 需要ST-Link将新的引导程序刷入UVK5的FLASH。
+# Instructions
+* Also refer to the losehu Bootloader Manual.pdf in this directory.
+* `LOSEHU_BASE_BOOT` is the base bootloader used to replace the official Quansheng bootloader. You can make it with Keil.
+* The bootloader file `BL_3_XXX.bin` generated after running `make` in the main directory is stored in EEPROM and loaded into RAM by the base bootloader.
+* `BL_3_XXX.bin` performs functions such as serial port firmware flashing and firmware switching.
 
-# 使用说明
-* 参考目录下losehu Bootloader说明书.pdf
-* LOSEHU_BASE_BOOT为基础引导程序，用来替换泉盛官方的BOOTLOADER
-* 主目录下make后生成的引导文件L_BLXXX.bin存储在eeprom中，由基础引导程序加载到RAM中
-* L_BLXXX.bin起到串口刷机、固件切换功能
+# Disclaimer:
 
-# 打赏
-
-如果这个项目对您有帮助,可以考虑赞助来支持开发工作。
-
-这是：[打赏名单](https://losehu.github.io/payment-codes/#%E6%94%B6%E6%AC%BE%E7%A0%81) 非常感谢各位的支持！！！
-
-打赏码：
-
-[![打赏码](https://github.com/losehu/uv-k5-firmware-chinese/blob/main/payment/show.png)](https://losehu.github.io/payment-codes/)
-
-# 免责声明：
-
-* **我没责任**
-* 电台在刷写过程中可能会变砖，我并不为此负责。
-* 我也不承担任何法律责任，这个项目是开源的，你可以自由使用，但是你必须对你的操作负责。
-
+* **I am not responsible**
+* Radios may be bricked during the flashing process, and I am not responsible for this.
+* I do not assume any legal responsibility. This project is open source; you are free to use it, but you must be responsible for your actions.
