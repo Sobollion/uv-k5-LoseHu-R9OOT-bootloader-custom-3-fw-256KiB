@@ -25,7 +25,7 @@ void SELECT_DISPLAY() {
         if (show_num > sum_menu)
             break;
         char str1[14];
-        EEPROM_ReadBuffer(0x40020 + 32 * (show_num - 1), str1, 13);
+        EEPROM_ReadBuffer(0X22F40 + 32 * (show_num - 1), str1, 13);
         str1[13] = 0;
         sprintf(str, "%02d.%s", show_num, str1);
         UI_PrintStringSmall(str, 8, 0, i);
@@ -33,7 +33,7 @@ void SELECT_DISPLAY() {
     if ((now_menu - 1) / NUM_PER_PAGE * NUM_PER_PAGE + 1 < sum_menu) memcpy(&gStatusLine[120], BITMAP_ARRAY_DOWN, 5);
     if ((now_menu - 1) / NUM_PER_PAGE) memcpy(&gStatusLine[112], BITMAP_ARRAY_UP, 5);
     //�̼��汾
-    UI_PrintStringSmallBuffer("R9OOT_BOOT_4_0.01", gStatusLine);
+    UI_PrintStringSmallBuffer("R9OOT_BOOT_6_0.01", gStatusLine);
     //ѡ�м�ͷ
     memcpy(&gFrameBuffer[(now_menu - 1) % NUM_PER_PAGE][0], BITMAP_ARRAY_RIGHT, sizeof(BITMAP_ARRAY_RIGHT));
     memcpy(&gFrameBuffer[(now_menu - 1) % NUM_PER_PAGE][120], BITMAP_ARRAY_LEFT, sizeof(BITMAP_ARRAY_LEFT));
