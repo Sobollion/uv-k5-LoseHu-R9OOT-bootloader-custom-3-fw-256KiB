@@ -73,7 +73,7 @@ int main(void) {
 #define NUM  16
         for (int i = 0; i < 12 * 1024 / NUM; i += 4) {
             uint32_t c[NUM];
-            EEPROM_ReadBuffer(0x10000 + i * NUM, (uint8_t * )
+            EEPROM_ReadBuffer(0x41000 + i * NUM, (uint8_t * )
             c, NUM * 4);
             write_to_memory1(0x20000800 + i * NUM, c, NUM);
         }
