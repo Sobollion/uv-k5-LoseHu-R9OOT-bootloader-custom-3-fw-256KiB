@@ -5,11 +5,11 @@
 #include "string.h"
 #include "port.h"
 // void write_to_memory(uint32_t address, uint32_t data) {
-//    // ½«µØÖ·ÊýÖµ×ª»»ÎªÖ¸Õë
+//    // ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Öµ×ªï¿½ï¿½ÎªÖ¸ï¿½ï¿½
 //    uint32_t *target_address = (uint32_t *) address;
-//    // ÏòÄ¿±êµØÖ·Ð´ÈëÊý¾Ý
+//    // ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½Ö·Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //    *target_address = data;
-//    // ÎªÁË±ÜÃâÓÅ»¯£¬È·±£´úÂë²»»á±»ÓÅ»¯µô
+//    // Îªï¿½Ë±ï¿½ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ë²»ï¿½á±»ï¿½Å»ï¿½ï¿½ï¿½
 //    volatile uint32_t read_back = *target_address;
 //	 
 //}
@@ -23,57 +23,57 @@ void jump_to_app(void) {
     uint32_t JumpAddress;
     pFunction Jump_To_Application;
 
-    /* ¼ì²éÕ»¶¥µØÖ·ÊÇ·ñºÏ·¨ */
+    /* ï¿½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½ï¿½Ö·ï¿½Ç·ï¿½Ï·ï¿½ */
 
-    /* ÆÁ±ÎËùÓÐÖÐ¶Ï£¬·ÀÖ¹ÔÚÌø×ª¹ý³ÌÖÐ£¬ÖÐ¶Ï¸ÉÈÅ³öÏÖÒì³£ */
+    /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶Ï£ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½Ð¶Ï¸ï¿½ï¿½Å³ï¿½ï¿½ï¿½ï¿½ì³£ */
     __disable_irq();
 
-    /* ÓÃ»§´úÂëÇøµÚ¶þ¸ö ×Ö Îª³ÌÐò¿ªÊ¼µØÖ·(¸´Î»µØÖ·) */
+    /* ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ ï¿½ï¿½ Îªï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Ö·(ï¿½ï¿½Î»ï¿½ï¿½Ö·) */
     JumpAddress = *(__IO
     uint32_t *) (APP_FLASH_ADDR + 4);
 
     /* Initialize user application's Stack Pointer */
-    /* ³õÊ¼»¯APP¶ÑÕ»Ö¸Õë(ÓÃ»§´úÂëÇøµÄµÚÒ»¸ö×ÖÓÃÓÚ´æ·ÅÕ»¶¥µØÖ·) */
+    /* ï¿½ï¿½Ê¼ï¿½ï¿½APPï¿½ï¿½Õ»Ö¸ï¿½ï¿½(ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½Õ»ï¿½ï¿½ï¿½ï¿½Ö·) */
     __set_MSP(*(__IO
     uint32_t *) APP_FLASH_ADDR);
 
-    /* ÀàÐÍ×ª»» */
+    /* ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ */
     Jump_To_Application = (pFunction) JumpAddress;
 
-    /* Ìø×ªµ½ APP */
+    /* ï¿½ï¿½×ªï¿½ï¿½ APP */
     Jump_To_Application();
 
 }
 
 
 void write_to_memory1(uint32_t address, uint32_t *data, size_t length) {
-    // ½«µØÖ·ÊýÖµ×ª»»ÎªÖ¸Õë
+    // ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½Öµ×ªï¿½ï¿½ÎªÖ¸ï¿½ï¿½
     uint32_t *target_address = (uint32_t *) address;
 
-    // Ñ­»·Ð´ÈëÊý¾Ýµ½Ä¿±êµØÖ·
+    // Ñ­ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Ýµï¿½Ä¿ï¿½ï¿½ï¿½Ö·
     for (size_t i = 0; i < length; i++) {
         target_address[i] = data[i];
-        // ÎªÁË±ÜÃâÓÅ»¯£¬È·±£´úÂë²»»á±»ÓÅ»¯µô
+        // Îªï¿½Ë±ï¿½ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½È·ï¿½ï¿½ï¿½ï¿½ï¿½ë²»ï¿½á±»ï¿½Å»ï¿½ï¿½ï¿½
         volatile uint32_t read_back = target_address[i];
     }
 }
 
 
 int main(void) {
-    SystemInit();           //Ê±ÖÓ³õÊ¼»¯
+    SystemInit();           //Ê±ï¿½Ó³ï¿½Ê¼ï¿½ï¿½
     Key_Init();
-    delay_init();           //ÑÓÊ±³õÊ¼»¯
+    delay_init();           //ï¿½ï¿½Ê±ï¿½ï¿½Ê¼ï¿½ï¿½
     uint8_t boot_mode = 1;
     if (!GPIO_GetBit(KEY1_GPIO_PORT, KEY1_GPIO_PIN) || !GPIO_GetBit(GPIOA, GPIO_PIN3)) {
         if (!GPIO_GetBit(KEY1_GPIO_PORT, KEY1_GPIO_PIN)) {
             boot_mode = 2;
         }
-        EEPROM_WriteBuffer(0X01FF0, (uint8_t * ) & boot_mode, 1);//½øÈëÒýµ¼
+        EEPROM_WriteBuffer(0X0FF81, (uint8_t * ) & boot_mode, 1);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         LED1_OFF;
 #define NUM  16
         for (int i = 0; i < 12 * 1024 / NUM; i += 4) {
             uint32_t c[NUM];
-            EEPROM_ReadBuffer(0x41000 + i * NUM, (uint8_t * )
+            EEPROM_ReadBuffer(0x10000 + i * NUM, (uint8_t * )
             c, NUM * 4);
             write_to_memory1(0x20000800 + i * NUM, c, NUM);
         }
