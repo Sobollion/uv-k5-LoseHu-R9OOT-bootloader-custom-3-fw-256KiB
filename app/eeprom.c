@@ -4,11 +4,12 @@
 #include "eeprom.h"
 #include "../app/uart.h"
 
+
 void ERROR_DISPLAY() {
     memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
     UI_PrintStringSmall("NO Firmware !!", 0, 127, 2);
-    UI_PrintStringSmall("Write in:", 0, 127, 3);
-    UI_PrintStringSmall("k5.vicicode.com", 0, 127, 4);
+    UI_PrintStringSmall("Instructions:", 0, 127, 3);
+    UI_PrintStringSmall("t.me/R9OOT_BOOT", 0, 127, 4);
     UI_PrintStringSmall("WRITE OR EXIT", 0, 127, 6);
 
 //    show_uint32(sum_menu, 5);
@@ -33,14 +34,16 @@ void GET_FIRMWARE_NUM() {
     }
 }
 
+//прошивка
 void LOAD_FIRMWARE() {
-    //����
+    uint8_t current_firm; //как и nowmenu принимает значения 1/2/3
+    EEPROM_ReadBuffer(0x0FF82, (uint8_t * ) & current_firm, 1); //Читаем из 0x0FF82 номер предыдущей прошивки в переменную current_firm
     memset(gFrameBuffer, 0, sizeof(gFrameBuffer));
-    UI_PrintStringSmall("KEEP POWER ON!", 0, 127, 4);
+    UI_PrintStringSmall("KEEP POWER ON!", 0, 127, 5);
     uint32_t start_add, end_add;
-    EEPROM_ReadBuffer(0x40020 + 32 * now_menu - 16, (uint8_t * ) & start_add, 4);
-    EEPROM_ReadBuffer(0x40020 + 32 * now_menu - 16 + 4, (uint8_t * ) & end_add, 4);
-    if (start_add > end_add || end_add > 0x80000 || start_add > 0x80000) {
+    EEPROM_ReadBuffer(0x0FFA0 + 32 * now_menu - 16, (uint8_t * ) & start_add, 4); //читаем адрес начала прошивки
+    EEPROM_ReadBuffer(0x0FFA0 + 32 * now_menu - 16 + 4, (uint8_t * ) & end_add, 4); //читаем адрес конца прошивки
+    if (start_add > end_add || end_add > 0x40000 || start_add > 0x40000) { //избегаем ошибок если адреса выходят за границы чипа M01
         ERROR_DISPLAY();
         return;
     }
@@ -60,9 +63,13 @@ void LOAD_FIRMWARE() {
         UI_PrintStringSmall(str, 20, 0, 1);
         ST7565_BlitFullScreen();
     }
-
-
-    CP_EEPROM_TO_FLASH(start_add, flash_add, end_add - start_add + 1);
+    CP_EEPROM_TO_FLASH(start_add, flash_add, end_add - start_add + 1); //Копируем прошивку из ипрома во флеш
+    if (current_firm!=now_menu) {
+        CP_EEPROM_TO_EEPROM(0x00000, 0x11000+0x2000*current_firm, 8192); //Сохраняем из 0x00000 в 0x11000+64*current_firm объём 8килоБайт(64килобита = 0x2000) 0-38000, 1-3A000, 2-3C000, 3-3E000
+        current_firm=now_menu; //Присваиваем current_firm=номер текущей now_menu
+        CP_EEPROM_TO_EEPROM(0x11000+0x2000*current_firm, 0x00000, 8192);//Сохраняем из 0x11000+64*current_firm в 0x00000 объём 8килоБайт(64килобита = 0x2000)
+        EEPROM_WriteBuffer(0x0FF82, (uint8_t * ) & current_firm, 1); //Пишем в 0x0FF82 current_firm
+    }
     NVIC_SystemReset();
 
 }
