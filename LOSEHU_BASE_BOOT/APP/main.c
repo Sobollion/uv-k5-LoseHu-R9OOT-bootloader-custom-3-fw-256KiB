@@ -68,7 +68,7 @@ int main(void) {
         if (!GPIO_GetBit(KEY1_GPIO_PORT, KEY1_GPIO_PIN)) {
             boot_mode = 2;
         }
-        EEPROM_WriteBuffer(0X0FF81, (uint8_t * ) & boot_mode, 1);//��������
+        EEPROM_WriteBuffer(0X40001, (uint8_t * ) & boot_mode, 1);//��������
         LED1_OFF;
 #define NUM  16
         for (int i = 0; i < 12 * 1024 / NUM; i += 4) {
