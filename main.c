@@ -63,7 +63,7 @@ void Main(void) {
     uint8_t boot_mode = 0;
     bool mode = 0;
 
-    EEPROM_ReadBuffer(0X40001, (uint8_t * ) & boot_mode, 1);
+    EEPROM_ReadBuffer(0X22F21, (uint8_t * ) & boot_mode, 1);
     if (boot_mode == 2) {
         mode = 1;
     }
