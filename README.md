@@ -1,7 +1,7 @@
 
 [![support me](https://img.shields.io/badge/Support%20me-CloudTips-blue)](https://pay.cloudtips.ru/p/c197b86d) [![readme ru](https://img.shields.io/badge/README%20%D0%BD%D0%B0%20%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%BE%D0%BC-214a57)](/README_RU.md)
 
-# Bootloader for Quansheng UVK5 Firmware Switching
+# Bootloader for Quansheng UVK5 Firmware Switching (UNTESTED)
 * 3 firmware Multiboot with independent settings, channels and calibrations for 256 KiB EEPROM
 * 4 firmware Multiboot with independent settings, channels and calibrations for 512 KiB EEPROM
 * 6 firmware Multiboot with independent settings, channels and calibrations for 512 KiB EEPROM
